@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useState, useRef } from '@wordpress/element';
@@ -10,7 +9,7 @@ import {
 	ToggleControl,
 	PanelBody,
 } from '@wordpress/components';
-import { 
+import {
 	InnerBlocks,
 	useBlockProps,
 	InspectorAdvancedControls,
@@ -32,7 +31,7 @@ export const LinkControl         = __experimentalLinkControl || stableLinkContro
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
-export default function Edit({ attributes, setAttributes, isSelected, clientId, context: { postType, postId, queryId } }) {
+export default function Edit({ attributes, setAttributes, isSelected, clientId, context: { postType, postId } }) {
 	const {
 		linkTarget,
 		ariaLabel,
@@ -40,79 +39,67 @@ export default function Edit({ attributes, setAttributes, isSelected, clientId, 
 		title,
 		url,
 		queryLoopLink,
-		colorText,
-		colorBkg,
 		colorBkgHover,
+		colorTextHover,
 	} = attributes;
 	const [ queryLoopUrl ] = useEntityProp( 'postType', postType, 'link', postId );
 	const { hasInnerBlocks } = useSelect(
 		( select ) => {
-			const { getBlock, getSettings } = select( blockEditorStore );
+			const { getBlock } = select( blockEditorStore );
 			const block = getBlock( clientId );
 			return {
 				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
-				themeSupportsLayout: getSettings()?.supportsLayout,
 			};
 		},
 		[ clientId ]
 	);
 	const ref = useRef();
-	const blockProps = useBlockProps( { ref } );
+	const hoverStyle = {};
+	if ( colorBkgHover ) hoverStyle['--color-bkg-hover'] = colorBkgHover;
+	if ( colorTextHover ) hoverStyle['--color-text-hover'] = colorTextHover;
+	const blockProps = useBlockProps({
+		ref,
+		style: Object.keys( hoverStyle ).length ? hoverStyle : undefined,
+	});
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: hasInnerBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender
 	} );
+
 	const onQueryLoopLink = useCallback(
-		( value ) => {
-			setAttributes( { queryLoopLink: value } );
-		},
+		( value ) => setAttributes( { queryLoopLink: value } ),
 		[ setAttributes ]
 	);
 	const onSetAriaLabel = useCallback(
-		( value ) => {
-			setAttributes( { ariaLabel: value } );
-		},
+		( value ) => setAttributes( { ariaLabel: value } ),
 		[ setAttributes ]
 	);
 	const onSetTabName = useCallback(
 		( value ) => {
 			const updatedRel = value !== '_blank' ? undefined : rel;
-
-			setAttributes( { 
-				linkTarget: value,
-				rel: updatedRel
-			} );
+			setAttributes( { linkTarget: value, rel: updatedRel } );
 		},
 		[ setAttributes ]
 	);
 	const onSetLinkRel = useCallback(
-		( value ) => {
-			setAttributes( { rel: value } );
-		},
+		( value ) => setAttributes( { rel: value } ),
 		[ setAttributes ]
 	);
 	const onSetLinkTitle = useCallback(
-		( value ) => {
-			setAttributes( { title: value } );
-		},
+		( value ) => setAttributes( { title: value } ),
 		[ setAttributes ]
 	);
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
 			const newLinkTarget = value ? '_blank' : undefined;
-
 			let updatedRel = rel;
 			if ( newLinkTarget && ! rel ) {
 				updatedRel = NEW_TAB_REL;
 			} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
 				updatedRel = undefined;
 			}
-
-			setAttributes( {
-				linkTarget: newLinkTarget,
-				rel: updatedRel,
-			} );
+			setAttributes( { linkTarget: newLinkTarget, rel: updatedRel } );
 		},
 		[ rel, setAttributes ]
 	);
@@ -131,14 +118,10 @@ export default function Edit({ attributes, setAttributes, isSelected, clientId, 
 		const urlIsSetandSelected = urlIsSet && isSelected;
 		const openLinkControl = () => {
 			setIsURLPickerOpen( true );
-			return false; // prevents default behaviour for event
+			return false;
 		};
 		const unlinkButton = () => {
-			setAttributes( {
-				url: undefined,
-				linkTarget: undefined,
-				rel: undefined,
-			} );
+			setAttributes( { url: undefined, linkTarget: undefined, rel: undefined } );
 			setIsURLPickerOpen( false );
 		};
 		const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
@@ -156,7 +139,6 @@ export default function Edit({ attributes, setAttributes, isSelected, clientId, 
 						opensInNewTab: newOpensInNewTab,
 					} ) => {
 						setAttributes( { url: newURL } );
-	
 						if ( opensInNewTab !== newOpensInNewTab ) {
 							onToggleOpenInNewTab( newOpensInNewTab );
 						}
@@ -203,90 +185,69 @@ export default function Edit({ attributes, setAttributes, isSelected, clientId, 
 
 	return (
 		<>
-			<div
-				{ ...blockProps }
-				className={ clsx( blockProps.className ) }
-				style={
-                    {
-						'--color-text': colorText?colorText:'',
-						'--color-bkg': colorBkg?colorBkg:'',
-                        '--color-bkg-hover': colorBkgHover?colorBkgHover:colorBkg,
-                    }}
-			>
-				<URLPicker
-					url={ url }
-					setAttributes={ setAttributes }
-					isSelected={ isSelected }
-					opensInNewTab={ linkTarget }
-					onToggleOpenInNewTab={ onToggleOpenInNewTab }
-					anchorRef={ ref }
+			<URLPicker
+				url={ url }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				opensInNewTab={ linkTarget }
+				onToggleOpenInNewTab={ onToggleOpenInNewTab }
+				anchorRef={ ref }
+			/>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label="Use link from Query Loop Block"
+						help="Link to the current post when using inside a Query Loop Block."
+						checked={ queryLoopLink }
+						onChange={ onQueryLoopLink }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					help={ __( 'Use same tabname as target to open in same tabs' ) }
+					label={ __( 'Tab name' ) }
+					value={ linkTarget || '' }
+					onChange={ onSetTabName }
 				/>
-				<InspectorControls>
-					<PanelBody title={ __( 'Link settings' ) }>
-						<ToggleControl
-							label="Use link from Query Loop Block"
-							help={
-								'Link to the current post when using inside a Query Loop Block.'
-							}
-							checked={ queryLoopLink }
-							onChange={ onQueryLoopLink }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<InspectorAdvancedControls>
-					<TextControl
-						help={ __( 'Use same tabname as target to open in same tabs' ) }
-						label={ __( 'Tab name' ) }
-						value={ linkTarget || '' }
-						onChange={ onSetTabName }
-					/>
-					<TextControl
-						label={ __( 'Link rel' ) }
-						value={ rel || '' }
-						onChange={ onSetLinkRel }
-					/>
-					<TextControl
-						label={ __( 'Aria-Label' ) }
-						value={ ariaLabel || '' }
-						onChange={ onSetAriaLabel }
-					/>
-					<TextControl
-						label={ __( 'Link title' ) }
-						value={ title || '' }
-						onChange={ onSetLinkTitle }
-					/>
-				</InspectorAdvancedControls>
-				<InspectorControls group="styles">
-					<PanelColorSettings
-							title={ __( 'Color' ) }
-							colorSettings={ [
-								{
-									value: colorText,
-									onChange: ( colorValue ) => setAttributes( { colorText: colorValue } ),
-									label: __( 'Text' ),
-									enableAlpha: true,
-									clearable: true,
-								},
-								{
-									value: colorBkg,
-									onChange: ( colorValue ) => setAttributes( { colorBkg: colorValue } ),
-									label: __( 'Background' ),
-									enableAlpha: true,
-									clearable: true,
-								},
-								{
-									value: colorBkgHover,
-									onChange: ( colorValue ) => setAttributes( { colorBkgHover: colorValue } ),
-									label: __( 'Background hover' ),
-									enableAlpha: true,
-									clearable: true,
-								},
-							] }
-						>
-					</PanelColorSettings>
-				</InspectorControls>
-				<a { ...innerBlocksProps } />
-			</div>
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ onSetLinkRel }
+				/>
+				<TextControl
+					label={ __( 'Aria-Label' ) }
+					value={ ariaLabel || '' }
+					onChange={ onSetAriaLabel }
+				/>
+				<TextControl
+					label={ __( 'Link title' ) }
+					value={ title || '' }
+					onChange={ onSetLinkTitle }
+				/>
+			</InspectorAdvancedControls>
+			<InspectorControls group="styles">
+				<PanelColorSettings
+					title={ __( 'Hover' ) }
+					colorSettings={ [
+						{
+							value: colorBkgHover,
+							onChange: ( colorValue ) => setAttributes( { colorBkgHover: colorValue } ),
+							label: __( 'Background hover' ),
+							enableAlpha: true,
+							clearable: true,
+						},
+						{
+							value: colorTextHover,
+							onChange: ( colorValue ) => setAttributes( { colorTextHover: colorValue } ),
+							label: __( 'Text hover' ),
+							enableAlpha: true,
+							clearable: true,
+						},
+					] }
+				/>
+			</InspectorControls>
+			<a { ...innerBlocksProps } />
 		</>
 	);
 }

@@ -3,8 +3,8 @@
  * Plugin Name:     Hyperlink Group Block
  * Plugin URI:      https://wordpress.org/plugins/hyperlink-group-block/
  * Description:     Combine blocks into a group wrapped with an hyperlink (&lt;a&gt;).
- * Version:         2.0.5
- * Author:          TipTopPress
+ * Version:         2.0.6
+ * Author:          Mild + TipTopPress
  * Author URI:      http://tiptoppress.com
  * License:         GPL-2.0-or-later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
@@ -72,64 +72,51 @@ add_action( 'init', __NAMESPACE__ . '\create_hyperlink_group_block_init' );
  */
 function add_button_size_class( $block_content = '', $block = [] ) {
 	if ( isset( $block['blockName'] ) && 'tiptip/hyperlink-group-block' === $block['blockName'] ) {
-		$color_text      = (isset( $block['attrs']['colorText'] ) && $block['attrs']['colorText'] !== '') ? '--color-text:' . $block['attrs']['colorText'] . ';' : '';
-		$color_bkg       = (isset( $block['attrs']['colorBkg'] ) && $block['attrs']['colorBkg'] !== '') ? $block['attrs']['colorBkg'] : '';
-		$color_bkg_hover = (isset( $block['attrs']['colorBkgHover'] ) && $block['attrs']['colorBkgHover'] !== '') ? $block['attrs']['colorBkgHover'] : $color_bkg;
-		$color_bkg       = $color_bkg !== '' ? '--color-bkg:' . $color_bkg . ';' : '';
-		$color_bkg_hover = $color_bkg_hover !== '' ? '--color-bkg-hover:' . $color_bkg_hover . ';' : '';
+		$color_bkg_hover = ( isset( $block['attrs']['colorBkgHover'] ) && $block['attrs']['colorBkgHover'] !== '' )
+			? '--color-bkg-hover:' . $block['attrs']['colorBkgHover'] . ';'
+			: '';
+		$color_text_hover = ( isset( $block['attrs']['colorTextHover'] ) && $block['attrs']['colorTextHover'] !== '' )
+			? '--color-text-hover:' . $block['attrs']['colorTextHover'] . ';'
+			: '';
 
 		$stripAnchors = function( $block ) use ( &$stripAnchors, &$block_content ) {
 			foreach( $block as $b){
-				if( str_contains( $b['innerHTML'], '<a' ) ) { 
+				if( str_contains( $b['innerHTML'], '<a' ) ) {
 					$replace = $b['innerHTML'];
-					$b['innerHTML'] = str_replace(
-						'<a',
-						'<span',
-						$b['innerHTML']
-					);
-					$b['innerHTML'] = str_replace(
-						'</a>',
-						'</span>',
-						$b['innerHTML']
-					);
-					$block_content = preg_replace(
-						'/\s[a-zA-Z0-9-]*--[a-zA-Z0-9]*/',
-						'',
-						$block_content
-					);
-					$block_content = str_replace(
-						trim($replace),
-						$b['innerHTML'],
-						$block_content
-					);
+					$b['innerHTML'] = str_replace( '<a', '<span', $b['innerHTML'] );
+					$b['innerHTML'] = str_replace( '</a>', '</span>', $b['innerHTML'] );
+					$block_content = preg_replace( '/\s[a-zA-Z0-9-]*--[a-zA-Z0-9]*/', '', $block_content );
+					$block_content = str_replace( trim($replace), $b['innerHTML'], $block_content );
 				}
-				if( ! empty( $b['innerBlocks'] ) ) { 
+				if( ! empty( $b['innerBlocks'] ) ) {
 					$stripAnchors( $b['innerBlocks'] );
 				}
 			}
 		};
 		$stripAnchors( $block['innerBlocks'] );
 
-		$pattern = "/<[^>]+>/";
-		preg_match($pattern, $block_content, $matches);
-		if( str_contains( $matches[0], 'style="' ) ) {
-			$block_content = str_replace(
-				'style="',
-				'style="' . esc_attr($color_text . $color_bkg . $color_bkg_hover),
-				$block_content
-			);
-		} else {
-			if( $color_text . $color_bkg . $color_bkg_hover ) :
-				$block_content = str_replace(
-					'<a',
-					'<a style="' . esc_attr($color_text . $color_bkg . $color_bkg_hover) . '"',
-					$block_content
+		$hover_styles = $color_bkg_hover . $color_text_hover;
+		if ( $hover_styles ) {
+			$pattern = "/<[^>]+>/";
+			preg_match( $pattern, $block_content, $matches );
+			if ( str_contains( $matches[0], 'style="' ) ) {
+				$block_content = preg_replace(
+					'/style="/',
+					'style="' . esc_attr( $hover_styles ),
+					$block_content,
+					1
 				);
-			endif;
+			} else {
+				$block_content = preg_replace(
+					'/<a/',
+					'<a style="' . esc_attr( $hover_styles ) . '"',
+					$block_content,
+					1
+				);
+			}
 		}
 
-		$content = $block_content;
-        return $content;
+		return $block_content;
 	}
 	return $block_content;
 }

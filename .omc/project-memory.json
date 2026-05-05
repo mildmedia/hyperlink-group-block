@@ -1,0 +1,124 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1777897224780,
+  "projectRoot": "/Users/johan/projects/kgm/app/wp-content/plugins/hyperlink-group-block",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": "npm run start",
+    "scripts": {
+      "build": "wp-scripts build",
+      "format:js": "wp-scripts format-js",
+      "lint:css": "wp-scripts lint-style",
+      "lint:js": "wp-scripts lint-js",
+      "start": "wp-scripts start",
+      "packages-update": "wp-scripts packages-update"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "master",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "build": {
+      "path": "build",
+      "purpose": "Build output",
+      "fileCount": 4,
+      "lastAccessed": 1777897224737,
+      "keyFiles": [
+        "index.asset.php",
+        "index.js",
+        "style-index-rtl.css",
+        "style-index.css"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 5,
+      "lastAccessed": 1777897224738,
+      "keyFiles": [
+        "deprecated.js",
+        "edit.js",
+        "index.js",
+        "save.js",
+        "style.scss"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "block.json",
+      "accessCount": 9,
+      "lastAccessed": 1777902829948,
+      "type": "file"
+    },
+    {
+      "path": "src/edit.js",
+      "accessCount": 7,
+      "lastAccessed": 1777901175911,
+      "type": "file"
+    },
+    {
+      "path": "src/style.scss",
+      "accessCount": 7,
+      "lastAccessed": 1777902856518,
+      "type": "file"
+    },
+    {
+      "path": "hyperlink-group-block.php",
+      "accessCount": 6,
+      "lastAccessed": 1777901200227,
+      "type": "file"
+    },
+    {
+      "path": "src/save.js",
+      "accessCount": 5,
+      "lastAccessed": 1777901100339,
+      "type": "file"
+    },
+    {
+      "path": "src/index.js",
+      "accessCount": 2,
+      "lastAccessed": 1777898358170,
+      "type": "file"
+    },
+    {
+      "path": "src/deprecated.js",
+      "accessCount": 2,
+      "lastAccessed": 1777898358210,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

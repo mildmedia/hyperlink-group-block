@@ -1,25 +1,28 @@
 /**
- * The following styles get applied both on the front of your site
- * and in the editor.
- *
- * Replace them with your own styles or remove the file completely.
+ * Applied both on the front of your site and in the editor.
  */
 
- /* editor and front end */
+// Force parent to contain floated block when alignleft/alignright is applied.
+// Without this, .is-layout-constrained clips its area before accounting for the float.
+.is-layout-constrained:has(> .wp-block-tiptip-hyperlink-group-block.alignleft),
+.is-layout-constrained:has(> .wp-block-tiptip-hyperlink-group-block.alignright) {
+	display: flow-root;
+}
 
- $color-text:      var(--color-text, none);
- $color-bkg:       var(--color-bkg, none);
- $color-bkg-hover: var(--color-bkg-hover, none);
-
-.wp-block-tiptip-hyperlink-group-block, .wp-block-tiptip-hyperlink-group-block a p {
+.wp-block-tiptip-hyperlink-group-block {
 	cursor: pointer;
 	display: block;
-	color: $color-text;
-	background-color: $color-bkg;
 
 	&:hover {
-			background-color: $color-bkg-hover;
+		// !important needed to override WP's inline background-color style on hover
+		background-color: var(--color-bkg-hover) !important;
+		color: var(--color-text-hover) !important;
+		border-color: var(--color-text-hover) !important;
 	}
+}
+
+.wp-block-tiptip-hyperlink-group-block a p {
+	cursor: pointer;
 }
 
 .wp-block-tiptip-hyperlink-group-block {
@@ -27,18 +30,6 @@
 	// "Float" style variation.
 	&.is-style-grid {
 
-		@media only screen and (min-width: 248px) {
-
-			// dd {
-			// 	padding-left: 2em;
-			// }
-
-			// display: grid;
-			// grid-template-columns: auto 1fr;
-			// grid-template-columns: auto auto;
-			// align-items: center;
-		}
+		@media only screen and (min-width: 248px) {}
 	}
 }
-
-

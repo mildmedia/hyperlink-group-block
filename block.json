@@ -3,27 +3,39 @@
 	"name": "tiptip/hyperlink-group-block",
 	"title": "Hyperlink Group",
 	"category": "design",
-    "supports": {
-        "html": true,
-        "anchor": true,
-        "align": true,
+	"supports": {
+		"html": true,
+		"anchor": true,
+		"align": true,
+		"color": {
+			"text": true,
+			"background": true,
+			"hover": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"width": true,
+			"style": true,
+			"radius": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
-    },
-	"usesContext": [ "postId", "postType", "queryId" ],
-    "attributes": {
-		"colorText": {
-			"type": "string"
-		},
-		"colorBkg": {
-			"type": "string"
-		},
+	},
+	"usesContext": [
+		"postId",
+		"postType",
+		"queryId"
+	],
+	"attributes": {
 		"colorBkgHover": {
+			"type": "string"
+		},
+		"colorTextHover": {
 			"type": "string"
 		},
 		"url": {
@@ -32,7 +44,7 @@
 		"title": {
 			"type": "string"
 		},
-        "linkTarget": {
+		"linkTarget": {
 			"type": "string"
 		},
 		"ariaLabel": {
@@ -41,20 +53,11 @@
 		"rel": {
 			"type": "string"
 		},
-        "backgroundColor": {
-			"type": "string"
-		},
-		"textColor": {
-			"type": "string"
-		},
-        "gradient": {
-			"type": "string"
-		},
 		"queryLoopLink": {
 			"type": "boolean",
 			"default": false
 		}
-    },
+	},
 	"textdomain": "hyperlink-group-block",
 	"editorScript": "file:./build/index.js",
 	"editorStyle": "file:./build/style-index.css",
